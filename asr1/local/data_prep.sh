@@ -35,5 +35,5 @@ fi
 
 if [ $stage -le 2 ]; then
     echo -e "${GREEN}Combine all data ...${NC}"
-    utils/combine_data.sh ${data_kaldi}/all ${data_kaldi}/train_l2 ${data_kaldi}/dev ${data_kaldi}/test
+    utils/combine_data.sh --extra_files "wrd_text wav_sph.scp phn_text transcript_phn_text" ${data_kaldi}/all ${data_kaldi}/train_l2 ${data_kaldi}/dev ${data_kaldi}/test
 fi
