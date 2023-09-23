@@ -4,6 +4,7 @@ import soundfile
 from tqdm import tqdm
 import numpy as np
 import sys
+from whisper.normalizers import BasicTextNormalizer
 from whisper.normalizers import EnglishTextNormalizer
 import whisperx
 import string
@@ -71,7 +72,8 @@ decode_options = {
                  }
 
 model = whisperx.load_model(model_tag, device, compute_type=compute_type, language=language, asr_options=decode_options)
-normalizer = EnglishTextNormalizer()
+normalizer = BasicTextNormalizer()
+normalizer_en = EnglishTextNormalizer()
 
 wavscp_dict = {}
 text_dict = {}
@@ -99,10 +101,11 @@ for i, uttid in tqdm(enumerate(utt_list)):
     audio = whisperx.load_audio(audio_file)
     result = model.transcribe(audio, batch_size=batch_size)
     text = [ result['segments'][i]['text'] for i in range(len(result['segments'])) ]
-    hyp = " ".join(text)
-    
-    ref_norm = normalizer(ref)
-    hyp_norm = normalizer(hyp)
+    hyp = " ".join(text)    
+    hyp = " ".join(normalizer(hyp).split())
+
+    ref_norm = normalizer_en(ref)
+    hyp_norm = normalizer_en(hyp)
     
     all_info[uttid] = { 
                         "ref": ref, "ref_norm": ref_norm, 
