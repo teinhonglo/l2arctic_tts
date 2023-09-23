@@ -102,7 +102,7 @@ for i, uttid in tqdm(enumerate(utt_list)):
     result = model.transcribe(audio, batch_size=batch_size)
     text = [ result['segments'][i]['text'] for i in range(len(result['segments'])) ]
     hyp = " ".join(text)    
-    hyp = " ".join(normalizer(hyp).split())
+    #hyp = " ".join(normalizer(hyp).split())
 
     ref_norm = normalizer_en(ref)
     hyp_norm = normalizer_en(hyp)
