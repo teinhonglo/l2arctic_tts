@@ -8,6 +8,7 @@ set -o pipefail
 # yourtts
 BACKEND=yourtts
 model_path="tts_models/multilingual/multi-dataset/your_tts"
+download=true
 
 # script
 stage=0
@@ -24,17 +25,30 @@ score_opts=
 . ./utils/parse_options.sh
 
 
-if [ $stage -le 0 ]; then
+if [ $stage -le 0 ]; then 
     for test_set in $test_sets; do
-         
         data_dir=data/$test_set
         output_dir=${data_dir}_yrtts
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \
                                               --output_dir $output_dir \
-                                              --model_path $model_path
+                                              --model_path $model_path \
+                                              --download "$download"
     done
 fi
 
 
+if [ $stage -le 1 ]; then 
+    for test_set in $test_sets; do
+        data_dir=data/$test_set    
+        output_dir=${data_dir}_yrtts_spkemb
+        
+        CUDA_VISIBLE_DEVICES="$gpuid" \
+            python local/inference_yourtts.py --data_dir $data_dir \
+                                              --output_dir $output_dir \
+                                              --model_path $model_path \
+                                              --spk_embed_type "all" \
+                                              --download "$download"
+    done
+fi
