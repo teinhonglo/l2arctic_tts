@@ -23,12 +23,27 @@ parser.add_argument("--model_path",
                     default="tts_models/multilingual/multi-dataset/your_tts",
                     type=str)
 
+parser.add_argument("--spk_embed_type",
+                    default="utt",
+                    choices=["all", "utt"],
+                    type=str)
+
+parser.add_argument("--download",
+                    default="true",
+                    choices=["true", "false"],
+                    type=str)
+
 args = parser.parse_args()
 
 data_dir = args.data_dir
 output_dir = args.output_dir
 output_wav_dir = os.path.join(output_dir, "wavs")
 model_path = args.model_path
+spk_embed_type = args.spk_embed_type
+download = True if args.download == "true" else False
+
+if not download:
+    config_path = os.path.join(os.path.dirname(model_path), "config.json")
 
 print("output dir: {output_dir}".format(output_dir=output_dir))
 if not os.path.exists(output_dir):
@@ -45,9 +60,12 @@ else:
 
 src_wavscp = os.path.join(data_dir, "wav.scp")
 src_text = os.path.join(data_dir, "text")
+src_spk2utt = os.path.join(data_dir, "spk2utt")
+
 uttid_list = []
 src_wavscp_dict = {}
 src_text_dict = {}
+src_spk2utt_dict = {}
 
 with open(src_wavscp, "r") as fn:
     for line in fn.readlines():
@@ -62,18 +80,47 @@ with open(src_text, "r") as fn:
         text = " ".join(info[1:])
         src_text_dict[uttid] = text
 
+with open(src_spk2utt, "r") as fn:
+    for line in fn.readlines():
+        info = line.split()
+        spkid = info[0]
+        src_spk2utt_dict[spkid] = info[1:]
+
 tgt_wavscp = os.path.join(output_dir, "wav.scp")
 tgt_wavscp_fn = open(tgt_wavscp, "w")
 
-tts = TTS(model_name=model_path, progress_bar=True, gpu=True)
+if download:
+    tts = TTS(model_name=model_path, progress_bar=True, gpu=True)
+else:
+    tts = TTS(model_path=model_path, config_path=config_path, progress_bar=True, gpu=True)
+
+# 合併該語者的所有句子，產生 spk.wav
+if spk_embed_type == "all":
+    from pydub import AudioSegment
+    for spkid, uttids in src_spk2utt_dict.items():
+        sounds = []
+        output_wav_path = os.path.join(output_wav_dir, spkid + ".wav")
+        
+        for uttid in uttids:
+            wav_path = src_wavscp_dict[uttid]
+            src_wavscp_dict[uttid] = output_wav_path
+            sounds.append(AudioSegment.from_wav(wav_path))
+            
+        combined_sounds = sounds[0]
+        for sound in sounds[1:]:
+            combined_sounds += sound
+        
+        combined_sounds.export(output_wav_path)
+elif spk_embed_type == "utt":
+    pass
+else:
+    pass
 
 for uttid in tqdm(uttid_list):
     wav_path = src_wavscp_dict[uttid]
     text = src_text_dict[uttid]
     
-    output_wav_path = os.path.join(output_wav_dir, os.path.basename(wav_path))
+    output_wav_path = os.path.join(output_wav_dir, uttid + ".wav")
     tts.tts_to_file(text, speaker_wav=wav_path, language="en", file_path=output_wav_path)
     
     tgt_wavscp_fn.write("{uttid} {output_wav_path}\n".format(uttid=uttid, output_wav_path=output_wav_path))
-
-
