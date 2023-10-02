@@ -8,11 +8,13 @@ set -o pipefail
 # yourtts
 BACKEND=yourtts
 model_path="tts_models/multilingual/multi-dataset/your_tts"
+model_affix=_yrtts
 download=true
 
 # script
-stage=0
 gpuid=0
+stage=0
+stop_stage=0
 l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
 data_root=data
 test_sets="all_16k" # test_set
@@ -25,10 +27,10 @@ score_opts=
 . ./utils/parse_options.sh
 
 
-if [ $stage -le 0 ]; then 
+if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     for test_set in $test_sets; do
-        data_dir=data/$test_set
-        output_dir=${data_dir}_yrtts
+        data_dir=$data_root/$test_set
+        output_dir=${data_dir}${model_affix}
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \
@@ -39,10 +41,10 @@ if [ $stage -le 0 ]; then
 fi
 
 
-if [ $stage -le 1 ]; then 
+if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     for test_set in $test_sets; do
-        data_dir=data/$test_set    
-        output_dir=${data_dir}_yrtts_spkemb
+        data_dir=$data_root/$test_set    
+        output_dir=${data_dir}${model_affix}_spkemb
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \

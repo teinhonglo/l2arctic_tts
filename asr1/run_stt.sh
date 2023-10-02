@@ -12,9 +12,11 @@ language=en
 
 # script
 stage=0
+stop_stage=100
 gpuid=0
 l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
 data_root=data
+exp_root=exp/stt
 test_sets="all" # test_sets，可更改成這次需 decode 的 data_set
 score_opts=
 
@@ -27,17 +29,17 @@ echo "$0 $@"
 . ./utils/parse_options.sh
 
 
-if [ $stage -le -1 ]; then
+if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     ./local/data_prep.sh --stage 0 \
                         --l2arctic_dir $l2arctic_dir \
                         --data_kaldi $data_root
 fi
 
-if [ $stage -le 0 ]; then
+if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     for test_set in $test_sets; do
         
-        data_dir=data/$test_set
-        output_dir="exp/whisper-$whisper_tag"/$test_set
+        data_dir=$data_root/$test_set
+        output_dir="$exp_root/whisper-$whisper_tag"/$test_set
         
         if [ -f $output_dir/RESULTS.md ]; then
             continue
@@ -52,11 +54,12 @@ if [ $stage -le 0 ]; then
 fi
 
 
-if [ $stage -le 1 ]; then
+if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     for test_set in $test_sets; do
-        data_dir=data/$test_set
-        output_dir="exp/whisper-$whisper_tag"/$test_set
+        data_dir=$data_root/$test_set
+        output_dir="$exp_root/whisper-$whisper_tag"/$test_set
         
+        echo $output_dir        
         sclite \
             ${score_opts} \
                 -r "$output_dir/ref" trn \
@@ -86,5 +89,7 @@ if [ $stage -le 1 ]; then
         echo ""
         echo "CER (Normalize)"
         grep -e Avg -e SPKR -m 2 "${output_dir}/result.normc.txt" | tee -a ${output_dir}/RESULTS.md
+        
+        echo "======================================================="
     done
 fi
