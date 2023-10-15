@@ -54,3 +54,31 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
                                               --download "$download"
     done
 fi
+
+if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
+    for test_set in $test_sets; do
+        data_dir=$data_root/$test_set    
+        output_dir=${data_dir}${model_affix}_spkm
+        
+        CUDA_VISIBLE_DEVICES="$gpuid" \
+            python local/inference_yourtts.py --data_dir $data_dir \
+                                              --output_dir $output_dir \
+                                              --model_path $model_path \
+                                              --spk_embed_type "male" \
+                                              --download "$download"
+    done
+fi
+
+if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
+    for test_set in $test_sets; do
+        data_dir=$data_root/$test_set    
+        output_dir=${data_dir}${model_affix}_spkfm
+        
+        CUDA_VISIBLE_DEVICES="$gpuid" \
+            python local/inference_yourtts.py --data_dir $data_dir \
+                                              --output_dir $output_dir \
+                                              --model_path $model_path \
+                                              --spk_embed_type "female" \
+                                              --download "$download"
+    done
+fi

@@ -25,7 +25,7 @@ parser.add_argument("--model_path",
 
 parser.add_argument("--spk_embed_type",
                     default="utt",
-                    choices=["all", "utt"],
+                    choices=["all", "utt", "male", "female"],
                     type=str)
 
 parser.add_argument("--download",
@@ -113,6 +113,8 @@ if spk_embed_type == "all":
         combined_sounds.export(output_wav_path)
 elif spk_embed_type == "utt":
     pass
+elif spk_embed_type in ["male", "female"]:
+    tts_spkid = tts.speakers[0] if spk_embed_type == "female" else tts.speakers[3]
 else:
     pass
 
@@ -121,6 +123,10 @@ for uttid in tqdm(uttid_list):
     text = src_text_dict[uttid]
     
     output_wav_path = os.path.join(output_wav_dir, uttid + ".wav")
-    tts.tts_to_file(text, speaker_wav=wav_path, language="en", file_path=output_wav_path)
+
+    if spk_embed_type in ["male", "female"]:
+        tts.tts_to_file(text, speaker=tts_spkid, language="en", file_path=output_wav_path)
+    else:
+        tts.tts_to_file(text, speaker_wav=wav_path, language="en", file_path=output_wav_path)
     
     tgt_wavscp_fn.write("{uttid} {output_wav_path}\n".format(uttid=uttid, output_wav_path=output_wav_path))
