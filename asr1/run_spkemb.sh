@@ -11,7 +11,6 @@ BACKEND=yourtts
 # script
 stage=0
 gpuid=0
-l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
 data_root=data
 exp_root=exp/secs
 test_sets=all_16k # test_set
