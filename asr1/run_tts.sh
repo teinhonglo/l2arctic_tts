@@ -15,7 +15,6 @@ download=true
 gpuid=0
 stage=0
 stop_stage=0
-l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
 data_root=data
 test_sets="all_16k" # test_set
 score_opts=
