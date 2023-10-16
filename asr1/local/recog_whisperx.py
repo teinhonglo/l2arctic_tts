@@ -78,6 +78,7 @@ normalizer_en = EnglishTextNormalizer()
 wavscp_dict = {}
 text_dict = {}
 utt_list = []
+utt2spk_dict = {}
 all_info = {}
 
 
@@ -91,6 +92,11 @@ with open(data_dir + "/text", "r") as fn:
     for line in fn.readlines():
         info = line.split()
         text_dict[info[0]] = " ".join(info[1:])
+
+with open(data_dir + "/utt2spk", "r") as fn:
+    for line in fn.readlines():
+        info = line.split()
+        utt2spk_dict[info[0]] = " ".join(info[1:])
 
 
 for i, uttid in tqdm(enumerate(utt_list)):
@@ -145,14 +151,15 @@ def charlize(utter):
 # human transcription
 for uttid in utt_list:
     if uttid in all_info:
+        spkid = utt2spk_dict[uttid]
         # reference
-        ref_fn.write("{utter} ({uttid})\n".format(utter=all_info[uttid]["ref"], uttid=uttid))
-        ref_norm_fn.write("{utter} ({uttid})\n".format(utter=all_info[uttid]["ref_norm"], uttid=uttid))
-        ref_normc_fn.write("{utter} ({uttid})\n".format(utter=charlize(all_info[uttid]["ref_norm"]), uttid=uttid))
+        ref_fn.write("{utter} ({spkid}-{uttid})\n".format(utter=all_info[uttid]["ref"], spkid=spkid, uttid=uttid))
+        ref_norm_fn.write("{utter} ({spkid}-{uttid})\n".format(utter=all_info[uttid]["ref_norm"], spkid=spkid, uttid=uttid))
+        ref_normc_fn.write("{utter} ({spkid}-{uttid})\n".format(utter=charlize(all_info[uttid]["ref_norm"]), spkid=spkid, uttid=uttid))
         # hypothesis
-        hyp_fn.write("{utter} ({uttid})\n".format(utter=all_info[uttid]["hyp"], uttid=uttid))
-        hyp_norm_fn.write("{utter} ({uttid})\n".format(utter=all_info[uttid]["hyp_norm"], uttid=uttid))
-        hyp_normc_fn.write("{utter} ({uttid})\n".format(utter=charlize(all_info[uttid]["hyp_norm"]), uttid=uttid))
+        hyp_fn.write("{utter} ({spkid}-{uttid})\n".format(utter=all_info[uttid]["hyp"], spkid=spkid, uttid=uttid))
+        hyp_norm_fn.write("{utter} ({spkid}-{uttid})\n".format(utter=all_info[uttid]["hyp_norm"], spkid=spkid, uttid=uttid))
+        hyp_normc_fn.write("{utter} ({spkid}-{uttid})\n".format(utter=charlize(all_info[uttid]["hyp_norm"]), spkid=spkid, uttid=uttid))
 
 
 ref_fn.close()
