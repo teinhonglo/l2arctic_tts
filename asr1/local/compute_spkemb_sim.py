@@ -68,7 +68,7 @@ def cosine_similarity(vector1, vector2):
     similarity = dot_product / (norm1 * norm2)
     return similarity
 
-# The neural network will automatically use CUDA if it'speaker available on your machine, otherwise it 
+# The neural network will automatically use CUDA if it's available on your machine, otherwise it 
 # will use the CPU. You can enforce a device of your choice by passing its name as argument to the 
 # constructor. The model might take a few seconds to load with CUDA, but it then executes very 
 # quickly.
