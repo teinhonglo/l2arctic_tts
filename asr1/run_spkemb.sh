@@ -15,8 +15,8 @@ l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
 data_root=data
 exp_root=exp/secs
 test_sets=all_16k # test_set
-test_conds="yrtts yrtts_spkemb"
-#test_conds="yrtts"
+#test_conds="yrtts yrtts_spkemb"
+test_conds="yrtts"
 spkids="HKK,YDCK,YKWK,HJK,BWC,LXC,TXHC,NCC,YBAA,SKA,ABA,ZHAA,EBVS,NJS,ERMS,MBMPS,RRBI,TNI,ASI,SVBI,HQTV,PNV,TLV,THV"
 score_opts=
 
@@ -38,7 +38,7 @@ if [ $stage -le 0 ]; then
             data_dir=data/$test_set
             data_dir2=${data_dir}_${test_cond}
             output_path=$exp_root/$test_set/cosine_sim-`basename $data_dir2`.txt
-        
+
             CUDA_VISIBLE_DEVICES="$gpuid" \
                 python local/compute_spkemb_sim.py --data_dir $data_dir --spkids $spkids \
                                                    --data_dir2 $data_dir2 > $output_path;

@@ -7,12 +7,17 @@ set -o pipefail
 
 # yourtts
 BACKEND=yourtts
-model_path="tts_models/multilingual/multi-dataset/your_tts"
-model_affix=_yrtts
-download=true
+#model_path="tts_models/multilingual/multi-dataset/your_tts" 
+#model_affix=_yrtts
+#download=true 
+
+#model_path=/share/nas165/mengting7tw/TTS/recipes/vctk/yourtts/YourTTS-EN-VCTK-September-08-2023_07+27PM-4e7f8cd0/best_model_533333.pth
+model_path=/share/nas165/mengting7tw/TTS/released_model/exp1_model/best_model_latest.pth.tar
+model_affix=_yrtts_exp1_model
+download=false # when you have downloaded the model or you want to use your own model
 
 # script
-gpuid=0
+gpuid=1
 stage=0
 stop_stage=0
 l2arctic_dir="/share/corpus/l2arctic_release_v4.0"

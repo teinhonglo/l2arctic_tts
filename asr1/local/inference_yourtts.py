@@ -121,6 +121,7 @@ for uttid in tqdm(uttid_list):
     text = src_text_dict[uttid]
     
     output_wav_path = os.path.join(output_wav_dir, uttid + ".wav")
-    tts.tts_to_file(text, speaker_wav=wav_path, language="en", file_path=output_wav_path)
+    #tts.tts_to_file(text, speaker_wav=wav_path, language="en", file_path=output_wav_path)
+    tts.tts_to_file(text, speaker_wav=wav_path, file_path=output_wav_path)
     
     tgt_wavscp_fn.write("{uttid} {output_wav_path}\n".format(uttid=uttid, output_wav_path=output_wav_path))

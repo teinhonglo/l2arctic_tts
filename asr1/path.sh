@@ -25,12 +25,12 @@ if [ ! -v BACKEND ]; then
 fi
 
 if [ "$BACKEND" == "whisperx" ]; then
-    eval "$(/share/homes/teinhonglo/anaconda3/bin/conda shell.bash hook)"
+    eval "$(/share/homes/mengting7tw/miniconda3/bin/conda shell.bash hook)"
     conda activate whisperx
 elif [ "$BACKEND" == "yourtts" ]; then
-    eval "$(/share/homes/teinhonglo/anaconda3/bin/conda shell.bash hook)"
+    eval "$(/share/homes/mengting7tw/miniconda3/bin/conda shell.bash hook)"
     conda activate yourtts
 elif [ "$BACKEND" == "pyannote" ]; then
-    eval "$(/share/homes/teinhonglo/anaconda3/bin/conda shell.bash hook)"
+    eval "$(/share/homes/mengting7tw/miniconda3/bin/conda shell.bash hook)"
     conda activate pyannote
 fi
