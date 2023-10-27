@@ -7,7 +7,7 @@ set -o pipefail
 
 # whisperx
 BACKEND=whisperx
-whisper_tag=tiny    # whisper model tag, e.g., small, medium, large, etc
+whisper_tag=tiny    # whisper model tag, e.g., tiny, small, medium, large, etc
 language=en
 
 # script
@@ -53,7 +53,6 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     done
 fi
 
-
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     for test_set in $test_sets; do
         data_dir=$data_root/$test_set
@@ -77,7 +76,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
                 -i rm -o all stdout > "${output_dir}/result.norm.txt"
         
         echo ""
-        echo "WER (Normalize)"
+        echo "WER (Normalized)"
         grep -e Avg -e SPKR -m 2 "${output_dir}/result.norm.txt" | tee -a ${output_dir}/RESULTS.md
         
         sclite \
@@ -87,7 +86,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
                 -i rm -o all stdout > "${output_dir}/result.normc.txt"
         
         echo ""
-        echo "CER (Normalize)"
+        echo "CER (Normalized)"
         grep -e Avg -e SPKR -m 2 "${output_dir}/result.normc.txt" | tee -a ${output_dir}/RESULTS.md
         
         echo "======================================================="

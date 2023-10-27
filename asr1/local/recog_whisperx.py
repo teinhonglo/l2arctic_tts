@@ -98,8 +98,12 @@ for i, uttid in tqdm(enumerate(utt_list)):
     ref = text_dict[uttid]
     # Confirm the sampling rate is equal to that of the training corpus.
     # If not, you need to resample the audio data before inputting to speech2text
-    audio = whisperx.load_audio(audio_file)
-    result = model.transcribe(audio, batch_size=batch_size)
+    
+    try:
+        audio = whisperx.load_audio(audio_file)
+        result = model.transcribe(audio, batch_size=batch_size)
+    except:
+        print(audio_file)
     text = [ result['segments'][i]['text'] for i in range(len(result['segments'])) ]
     hyp = " ".join(text)    
     #hyp = " ".join(normalizer(hyp).split())
