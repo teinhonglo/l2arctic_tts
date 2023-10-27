@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Author: Fu-An Chao
+# 	  this code is modified from Kaiqi Fu, JinJong Lin
 stage=0
 
 l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
