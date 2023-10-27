@@ -42,3 +42,15 @@ if [ $stage -le 1 ]; then
     
     utils/fix_data_dir.sh --spk_extra_files spk2age $dest_all_dir
 fi
+
+if [ $stage -le 2 ]; then
+    echo -e "${GREEN}create dataset over {age_limit} ...${NC}"
+    src_all_dir=$data_kaldi/${corpus_prefix}all
+    dest_all_dir=$data_kaldi/${corpus_prefix}all_o${age_limit}
+    
+    awk -v limit="$age_limit" '$2 > limit {print $1}' $src_all_dir/spk2age > $src_all_dir/spklist.o${age_limit}
+    utils/subset_data_dir.sh --spk-list $src_all_dir/spklist.o${age_limit} $src_all_dir $dest_all_dir
+    cp $src_all_dir/spk2age $dest_all_dir
+    
+    utils/fix_data_dir.sh --spk_extra_files spk2age $dest_all_dir
+fi

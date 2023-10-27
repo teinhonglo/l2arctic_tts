@@ -55,7 +55,7 @@ if not os.path.exists(output_dir):
         shutil.copy2(os.path.join(data_dir, fname), output_dir)
     
 else:
-    print("{output_dir} is already existed".format(output_dir=output_dir))
+    print("{output_dir} had already existed".format(output_dir=output_dir))
     exit(0)
 
 src_wavscp = os.path.join(data_dir, "wav.scp")

@@ -80,7 +80,7 @@ if not os.path.exists(output_dir):
     tgt_wavscp_fn = open(tgt_wavscp, "w")
     
 else:
-    print("[WARNING] {output_dir} is already existed".format(output_dir=output_dir))
+    print("[WARNING] {output_dir} had already existed".format(output_dir=output_dir))
     tgt_wavscp = os.path.join(output_dir, "wav.scp")
     tgt_wavscp_fn = open(tgt_wavscp, "a")
     #exit(0)
