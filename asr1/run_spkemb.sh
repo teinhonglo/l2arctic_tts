@@ -14,14 +14,10 @@ gpuid=0
 data_root=data
 exp_root=exp/secs
 test_sets=all_16k # test_set
-#test_conds="yrtts yrtts_spkemb"
-test_conds="yrtts"
+test_conds="yrtts yrtts_spkemb"
 #spkids="HKK,YDCK,YKWK,HJK,BWC,LXC,TXHC,NCC,YBAA,SKA,ABA,ZHAA,EBVS,NJS,ERMS,MBMPS,RRBI,TNI,ASI,SVBI,HQTV,PNV,TLV,THV"
 spkids=
 score_opts=
-
-# decode_options is used in Whisper model's transcribe method
-#decode_options="{language: en, task: transcribe, temperature: 0, beam_size: 10, fp16: False}"
 
 . ./path.sh
 . ./utils/parse_options.sh

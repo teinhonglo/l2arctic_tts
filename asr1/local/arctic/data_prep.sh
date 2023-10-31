@@ -48,6 +48,15 @@ if [ ${stage} -le 1 ]; then
         
     done 
 
-    utils/combine_data.sh $data_kaldi/cmu_arctic_7spks $data_kaldi/{slt,bdl,rms,clb,ksp,jmk,awb}
-    exit 0
+    utils/combine_data.sh $data_kaldi/arctic_7spks $data_kaldi/{slt,bdl,rms,clb,ksp,jmk,awb}
+    utils/copy_data_dir.sh $data_kaldi/arctic_7spks $data_kaldi/arctic_7spks_punc
+    cat $data_kaldi/{slt,bdl,rms,clb,ksp,jmk,awb}/wrd_text.ori > $data_kaldi/arctic_7spks_punc/text
+    utils/fix_data_dir.sh $data_kaldi/arctic_7spks_punc
+fi
+
+if [ ${stage} -le 2 ]; then
+    echo -e "${GREEN}making all arctics ...${NC}"
+    
+    cut -d"_" -f2- $data_kaldi/arctic_7spks/text | sort -k1,1 | uniq > $data_kaldi/text_arctics
+    cut -d'_' -f2- $data_kaldi/arctic_7spks_punc/text | sort -k1,1 | uniq > $data_kaldi/text_arctics.ori
 fi
