@@ -9,7 +9,12 @@ import argparse
 
 from TTS.api import TTS
 
+
 parser = argparse.ArgumentParser()
+
+parser.add_argument("--lang",
+                    default=None,
+                    type=str)
 
 parser.add_argument("--data_dir",
                     default="data/all_16k",
@@ -35,6 +40,7 @@ parser.add_argument("--download",
 
 args = parser.parse_args()
 
+lang = args.lang
 data_dir = args.data_dir
 output_dir = args.output_dir
 output_wav_dir = os.path.join(output_dir, "wavs")
@@ -118,6 +124,7 @@ elif spk_embed_type in ["male", "female"]:
 else:
     pass
 
+
 for uttid in tqdm(uttid_list):
     wav_path = src_wavscp_dict[uttid]
     text = src_text_dict[uttid]
@@ -125,8 +132,8 @@ for uttid in tqdm(uttid_list):
     output_wav_path = os.path.join(output_wav_dir, uttid + ".wav")
 
     if spk_embed_type in ["male", "female"]:
-        tts.tts_to_file(text, speaker=tts_spkid, language="en", file_path=output_wav_path)
+        tts.tts_to_file(text, speaker=tts_spkid, language=lang, file_path=output_wav_path)
     else:
-        tts.tts_to_file(text, speaker_wav=wav_path, language="en", file_path=output_wav_path)
+        tts.tts_to_file(text, speaker_wav=wav_path, language=lang, file_path=output_wav_path)
     
     tgt_wavscp_fn.write("{uttid} {output_wav_path}\n".format(uttid=uttid, output_wav_path=output_wav_path))
