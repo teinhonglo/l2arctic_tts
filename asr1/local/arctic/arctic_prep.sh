@@ -33,6 +33,7 @@ fi
 # set filenames
 scp=${data_dir}/wav.scp
 phn_text=${data_dir}/phn_text
+wrd_text_ori=${data_dir}/wrd_text.ori
 wrd_text=${data_dir}/wrd_text
 transcript_phn_text=${data_dir}/transcript_phn_text
 
@@ -69,5 +70,8 @@ echo "making wrd_text"
 raw_text=${db}/etc/txt.done.data
 ids=$(sed < ${raw_text} -e "s/^( /${spk}_/g" -e "s/ )$//g" | cut -d " " -f 1)
 #sentences=$(sed < ${raw_text} -e "s/^( //g" -e "s/ )$//g" -e "s/\"//g" | tr '[:lower:]' '[:upper:]' | cut -d " " -f 2-)
+sentences_ori=$(sed < ${raw_text} -e "s/^( //g" -e "s/ )$//g" -e "s/\"//g" | cut -d " " -f 2-)
 sentences=$(sed < ${raw_text} -e "s/^( //g" -e "s/ )$//g" -e "s/\"//g" -e "s/[,.]//g" | tr '[:upper:]' '[:lower:]' | cut -d " " -f 2-)
+
+paste -d " " <(echo "${ids}") <(echo "${sentences_ori}") > ${wrd_text_ori}
 paste -d " " <(echo "${ids}") <(echo "${sentences}") > ${wrd_text}
