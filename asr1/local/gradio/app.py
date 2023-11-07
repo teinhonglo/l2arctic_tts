@@ -18,6 +18,7 @@ from TTS.api import TTS
 from TTS.tts.configs.xtts_config import XttsConfig
 from TTS.tts.models.xtts import Xtts
 from TTS.utils.generic_utils import get_user_data_dir
+import librosa
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -36,7 +37,13 @@ args = parser.parse_args()
 # args
 model_path = args.model_path
 download = True if args.download == "true" else False
+
+# model Initialization
+device = "cuda" if torch.cuda.is_available() else "cpu"
 encoder = VoiceEncoder()
+mos_predictor = torch.hub.load("tarepan/SpeechMOS:v1.2.0", "utmos22_strong").to(
+            device
+        )
 
 # Initilization for a TTS model
 if not download:
@@ -177,6 +184,11 @@ def predict(prompt, language, audio_file_pth, mic_file_path, use_mic, voice_clea
             cos_sim = cosine_similarity(embed1, embed2)
             print(f"I: SECS: {cos_sim}")
             metrics_text+=f"SECS: {cos_sim}\n"
+
+            wave, sr = librosa.load(os.path.join(script_dir, "output.wav"), sr=None, mono=True)
+            predictor = torch.hub.load("tarepan/SpeechMOS:v1.2.0", "utmos22_strong", trust_repo=True)
+            mos = predictor(torch.from_numpy(wave).unsqueeze(0), sr).item()
+            metrics_text += f"MOS: {mos}\n"
             #real_time_factor= (time.time() - t0) / out['wav'].shape[-1] * 24000
             #print(f"Real-time factor (RTF): {real_time_factor}")
             #metrics_text+=f"Real-time factor (RTF): {real_time_factor:.2f}\n" 
@@ -287,11 +299,11 @@ gr.Interface(
                     info="This check can improve output if your microphone or reference voice is noisy",
                     ),
         gr.Checkbox(label="Do not use language auto-detect",
-                    value=False,
+                    value=True,
                     info="Check to disable language auto-detection",),
         gr.Checkbox(
             label="Agree",
-            value=False,
+            value=True,
             info="I agree to the terms of the Coqui Public Model License at https://coqui.ai/cpml",
         ),
 
