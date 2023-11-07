@@ -31,6 +31,6 @@ elif [ "$BACKEND" == "yourtts" ]; then
     eval "$(/share/homes/mengting7tw/miniconda3/bin/conda shell.bash hook)"
     conda activate yourtts
 elif [ "$BACKEND" == "pyannote" ]; then
-    eval "$(/share/homes/teinhonglo/anaconda3/bin/conda shell.bash hook)"
+    eval "$(/share/homes/mengting7tw/miniconda3/bin/conda shell.bash hook)"
     conda activate pyannote
 fi

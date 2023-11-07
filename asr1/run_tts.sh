@@ -18,7 +18,7 @@ batch_size=4
 # script
 gpuid=0
 stage=0
-stop_stage=0
+stop_stage=1
 data_root=data
 test_sets="all_16k" # test_set
 score_opts=
