@@ -18,7 +18,7 @@ batch_size=4
 # script
 gpuid=0
 stage=0
-stop_stage=1
+stop_stage=0
 data_root=data
 test_sets="all_16k" # test_set
 score_opts=
@@ -43,7 +43,8 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
                                               --data_dir $data_dir \
                                               --output_dir $output_dir \
                                               --model_path $model_path \
-                                              --download "$download"
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         else
             CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \
@@ -51,7 +52,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
                                               --model_path $model_path \
                                               --download "$download" \
                                               --voice_cleanup $voice_cleanup
-        
+	fi
         CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size 
     done
@@ -70,7 +71,8 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
                                               --output_dir $output_dir \
                                               --model_path $model_path \
                                               --spk_embed_type "all" \
-                                              --download "$download"
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         else
             CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \
@@ -79,9 +81,9 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
                                               --spk_embed_type "all" \
                                               --download "$download" \
                                               --voice_cleanup $voice_cleanup
-        
+	fi 
         CUDA_VISIBLE_DEVICES="$gpuid" \
-            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size
+            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size 
     done
 fi
 
@@ -97,7 +99,8 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
                                               --output_dir $output_dir \
                                               --model_path $model_path \
                                               --spk_embed_type "male" \
-                                              --download "$download"
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         else
             CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \
@@ -106,7 +109,7 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
                                               --spk_embed_type "male" \
                                               --download "$download" \
                                               --voice_cleanup $voice_cleanup
-        
+	fi 
         CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size
     done
@@ -124,7 +127,8 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
                                               --output_dir $output_dir \
                                               --model_path $model_path \
                                               --spk_embed_type "female" \
-                                              --download "$download"
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         else
             CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/inference_yourtts.py --data_dir $data_dir \
@@ -133,6 +137,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
                                               --spk_embed_type "female" \
                                               --download "$download" \
                                               --voice_cleanup $voice_cleanup
+	fi 
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
             python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size
