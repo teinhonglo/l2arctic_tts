@@ -7,17 +7,13 @@ set -o pipefail
 
 # yourtts
 BACKEND=yourtts
-# model_path="tts_models/multilingual/multi-dataset/your_tts" 
-# model_affix=_yrtts
-# download=true 
+model_path="tts_models/multilingual/multi-dataset/your_tts"
+model_affix=_yrtts
+download=true
+voice_cleanup=false
 
-# model_path=/share/nas165/mengting7tw/TTS/recipes/vctk/yourtts/YourTTS-EN-VCTK-July-27-2023_10+52PM-2071088b/best_model.pth
-# model_affix=_yrtts_July27
-# model_path=/share/nas165/mengting7tw/TTS/released_model/exp1_model/best_model_latest.pth.tar
-# model_affix=_yrtts_exp1
-model_path=/share/nas165/mengting7tw/TTS/recipes/vctk/yourtts/YourTTS-EN-VCTK-September-08-2023_07+27PM-4e7f8cd0/best_model.pth
-model_affix=_yrtts_Sep08
-download=false # set it to false when you have downloaded the model or you want to use your own model
+# SpeechMos
+batch_size=4
 
 # script
 gpuid=0
@@ -53,11 +49,11 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
             python local/inference_yourtts.py --data_dir $data_dir \
                                               --output_dir $output_dir \
                                               --model_path $model_path \
-                                              --download "$download"
-        fi
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
-            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir
+            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size 
     done
 fi
 
@@ -81,11 +77,11 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
                                               --output_dir $output_dir \
                                               --model_path $model_path \
                                               --spk_embed_type "all" \
-                                              --download "$download"
-        fi
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
-            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir
+            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size
     done
 fi
 
@@ -108,11 +104,11 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
                                               --output_dir $output_dir \
                                               --model_path $model_path \
                                               --spk_embed_type "male" \
-                                              --download "$download"
-        fi
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
-            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir
+            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size
     done
 fi
 
@@ -135,10 +131,10 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
                                               --output_dir $output_dir \
                                               --model_path $model_path \
                                               --spk_embed_type "female" \
-                                              --download "$download"
-        fi
+                                              --download "$download" \
+                                              --voice_cleanup $voice_cleanup
         
         CUDA_VISIBLE_DEVICES="$gpuid" \
-            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir
+            python local/eval_pseudomos.py $output_dir/wav.scp --outdir $output_dir --batch_size $batch_size
     done
 fi
