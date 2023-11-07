@@ -40,6 +40,10 @@ def voice_clean(speaker_wav, out_filename):
 # ArgumentParser
 parser = argparse.ArgumentParser()
 
+parser.add_argument("--lang",
+                    default=None,
+                    type=str)
+
 parser.add_argument("--data_dir",
                     default="data/all_16k",
                     type=str)
@@ -164,7 +168,7 @@ for uttid in tqdm(uttid_list):
     output_wav_path = os.path.join(output_wav_dir, uttid + ".wav")
 
     if spk_embed_type in ["male", "female"]:
-        tts.tts_to_file(text, speaker=tts_spkid, language="en", file_path=output_wav_path)
+        tts.tts_to_file(text, speaker=tts_spkid, language=lang, file_path=output_wav_path)
     else:
         if voice_cleanup:
             speaker_wav = voice_clean(speaker_wav, output_wav_path.split(".wav")[0] + "_cln.wav")
