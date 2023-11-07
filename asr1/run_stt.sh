@@ -17,7 +17,7 @@ gpuid=0
 l2arctic_dir="/share/corpus/l2arctic_release_v4.0"
 data_root=data
 exp_root=exp/stt
-test_sets="all_16k_yrtts_Sep08 all_16k_yrtts_Sep08_spkemb" # test_sets，可更改成這次需 decode 的 data_set
+test_sets="all" # test_sets，可更改成這次需 decode 的 data_set
 score_opts=
 
 # decode_options is used in Whisper model's transcribe method
