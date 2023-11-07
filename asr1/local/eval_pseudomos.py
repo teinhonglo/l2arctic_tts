@@ -18,6 +18,8 @@ import librosa
 import numpy as np
 import torch
 
+# Read up to 30 seconds maximum; truncate the audio file if it exceeds this.
+MAX_LEN = 30
 
 def find_files(
     root_dir: str, query: List[str] = ["*.flac", "*.wav"], include_root_dir: bool = True
@@ -52,18 +54,20 @@ def calculate(
     file_list: List[str],
     predictor: torch.nn.Module,
     device: torch.device,
-    batchsize: int,
+    batch_size: int,
 ):
     """Calculate pseudo MOS."""
     pmos_dict = {}
+    # 16000, 22000, 44100
     fs = librosa.get_samplerate(file_list[0])
-    for si, _ in enumerate(file_list[::batchsize]):
+    
+    for si, _ in enumerate(file_list[::batch_size]):
         gen_paths = []
         gen_xs = []
-        for bi in range(batchsize):
-            if si * batchsize + bi >= len(file_list):
+        for bi in range(batch_size):
+            if si * batch_size + bi >= len(file_list):
                 break
-            gen_path = file_list[si * batchsize + bi]
+            gen_path = file_list[si * batch_size + bi]
             gen_paths.append(gen_path)
             gen_x, gen_fs = librosa.load(gen_path, sr=None, mono=True)
             # Assuming same sampling rate for all files.
@@ -71,9 +75,17 @@ def calculate(
             gen_xs.append(gen_x)
         # Padding
         max_len = max([len(gen_x) for gen_x in gen_xs])
-        for bi in range(batchsize):
-            if si * batchsize + bi >= len(file_list):
+        
+        if max_len > fs * MAX_LEN:
+            max_len = fs * MAX_LEN
+        
+        for bi in range(batch_size):
+            if si * batch_size + bi >= len(file_list):
                 break
+            
+            if len(gen_xs[bi]) > max_len:
+                gen_xs[bi] = gen_xs[bi][:max_len]
+            
             gen_xs[bi] = np.pad(
                 gen_xs[bi],
                 (0, max_len - len(gen_xs[bi])),
@@ -113,7 +125,7 @@ def get_parser() -> argparse.Namespace:
         help="Toolkit to calculate pseudo MOS.",
     )
     parser.add_argument(
-        "--batchsize",
+        "--batch_size",
         default=4,
         type=int,
         help="Number of batches.",
@@ -177,7 +189,7 @@ def main():
         raise NotImplementedError(f"Not supported {args.mos_toolkit}.")
 
     # Calculate pseudo MOS for all the files.
-    pmos_dict = calculate(gen_files, predictor, device, args.batchsize)
+    pmos_dict = calculate(gen_files, predictor, device, args.batch_size)
 
     # convert to standard list
     pmos_dict = dict(pmos_dict)
