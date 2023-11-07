@@ -48,9 +48,9 @@ mos_predictor = torch.hub.load("tarepan/SpeechMOS:v1.2.0", "utmos22_strong").to(
 # Initilization for a TTS model
 if not download:
     config_path = os.path.join(os.path.dirname(model_path), "config.json")
-    tts = TTS(model_path=model_path, config_path=config_path, progress_bar=True, gpu=False)
+    tts = TTS(model_path=model_path, config_path=config_path, progress_bar=True, gpu=True)
 else:
-    tts = TTS(model_name=model_path, progress_bar=True, gpu=False)
+    tts = TTS(model_name=model_path, progress_bar=True, gpu=True)
 
 HF_TOKEN = os.environ.get("HF_TOKEN")
 
