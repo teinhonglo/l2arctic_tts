@@ -50,15 +50,3 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
                                 --test_sets "test dev train_l2 all"
 fi
 
-# mdd
-if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
-    valid_set=dev
-    test_set=test
-    python local/mispronunciation_dtw_evaluator.py --valid_transcript data-mdd/$valid_set/transcript_phn_text \
-                                                    --valid_targets data-mdd/$valid_set/detection_targets \
-                                                    --valid_dtw_folder exp/mdd/$valid_set/dtw_wav2vec2/phones \
-                                                    --test_transcript data-mdd/$test_set/transcript_phn_text \
-                                                    --test_targets data-mdd/$test_set/detection_targets \
-                                                    --test_dtw_folder exp/mdd/$test_set/dtw_wav2vec2/phones \
-                                                    --save_path exp/mdd/$test_set/dtw_wav2vec2/dtw.png
-fi

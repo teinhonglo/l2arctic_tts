@@ -2,7 +2,6 @@
 
 # Author: Fu-An Chao
 # 	  this code is modified from Kaiqi Fu, JinJong Lin
-stage=0
 
 BACKEND=yourtts
 
@@ -13,6 +12,8 @@ align_dir=align_org
 align_dir2=align_ref
 feats="wav2vec2"
 intervals="words,phones"
+stage=0
+stop_stage=10000
 test_sets=
 
 . ./path.sh
@@ -22,7 +23,7 @@ GREEN='\033[0;32m' # green
 NC='\033[0m' # no color
 
 
-if [ $stage -le 0 ]; then   
+if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     echo -e "${GREEN}Compute DTW distance between $align_dir and $align_dir2 ${NC}"
     for test_set in $test_sets; do
 
@@ -31,6 +32,12 @@ if [ $stage -le 0 ]; then
         src_wavscp=$data_root/$test_set/wav.scp
         tgt_wavscp=$data_root/$test_set/wav_ref.scp
         output_root=$exp_root/$test_set/dtw_${feats}
+
+        if [ ! -d $output_root/phones ]; then
+            echo "$output_root/phones had already exsited."
+            wait 5
+            continue
+        fi
 
         python local/compute_dtw_cost.py    --src_align_dir $src_align_dir \
                                             --tgt_align_dir $tgt_align_dir \
