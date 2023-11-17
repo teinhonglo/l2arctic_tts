@@ -38,6 +38,12 @@ if [ $stage -le 0 ]; then
             python local/aligner.py --data_dir $data_root/$test_set \
                                     --output_dir $exp_root/$test_set/align_ref \
                                     --wavscp_fn wav_ref.scp 
+
+        CUDA_VISIBLE_DEVICES=$gpuid \
+            python local/aligner.py --data_dir $data_root/$test_set \
+                                    --output_dir $exp_root/$test_set/align_l1ref \
+                                    --wavscp_fn wav_l1ref.scp
+
     done
 fi
 

@@ -270,14 +270,14 @@ if __name__ == "__main__":
 
     # Process training set data to calculate optimal thresholds
     valid_combined_data = combine_data(valid_transcript, valid_detection_targets, valid_dtw_costs)
-    optimal_thresholds = calculate_optimal_thresholds(valid_combined_data)
+    optimal_thresholds = calculate_eer_thresholds(valid_combined_data)
+    print("Optimal Thresholds:", optimal_thresholds)
+    print()
 
     # Process test set data using the calculated optimal thresholds
     test_combined_data = combine_data(test_transcript, test_detection_targets, test_dtw_costs)
     metrics = evaluate_pronunciation(test_combined_data, optimal_thresholds)
 
     # Output results
-    print("Optimal Thresholds:", optimal_thresholds)
-    print()
     print("Evaluation Metrics:", metrics)
     plot_dtw_costs(test_combined_data, save_path)

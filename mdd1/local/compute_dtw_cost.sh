@@ -30,14 +30,8 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
         src_align_dir=$exp_root/$test_set/$align_dir
         tgt_align_dir=$exp_root/$test_set/$align_dir2   
         src_wavscp=$data_root/$test_set/wav.scp
-        tgt_wavscp=$data_root/$test_set/wav_ref.scp
+        tgt_wavscp=$data_root/$test_set/wav_l1ref.scp
         output_root=$exp_root/$test_set/dtw_${feats}
-
-        if [ ! -d $output_root/phones ]; then
-            echo "$output_root/phones had already exsited."
-            wait 5
-            continue
-        fi
 
         python local/compute_dtw_cost.py    --src_align_dir $src_align_dir \
                                             --tgt_align_dir $tgt_align_dir \

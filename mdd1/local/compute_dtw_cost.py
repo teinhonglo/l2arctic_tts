@@ -114,24 +114,28 @@ def seq_dtw(src_wav_path, tgt_wav_path, src_intervals, tgt_intervals, feats, out
         # spectrogram
         src_feats = get_spectrogram(src_audio, src_sr)
         tgt_feats = get_spectrogram(tgt_audio, tgt_sr)
-        resolution = src_sr / 256  # Assuming hop_length=256
+        src_resolution = src_sr / 256  # Assuming hop_length=256
+        tgt_resolution = tgt_sr / 256
 
     elif feats == "wav2vec2":
         # wav2vec2
         src_feats = get_wav2vec2_features(src_audio, src_sr)
         tgt_feats = get_wav2vec2_features(tgt_audio, tgt_sr)
-        resolution = src_audio.shape[0] / src_feats.shape[0]  # Approximation, adjust based on model specifics
+        src_resolution = src_sr / (src_audio.shape[0] / src_feats.shape[0])  # Approximation, adjust based on model specifics
+        tgt_resolution = tgt_sr / (tgt_audio.shape[0] / tgt_feats.shape[0])  # Approximation, adjust based on model specifics
 
     elif feats == "whisper":
         # whisper
         src_feats = get_whisper_features(src_audio, src_sr)
         tgt_feats = get_whisper_features(tgt_audio, tgt_sr)
-        resolution = src_audio.shape[0] / src_feats.shape[0]  # Approximation, adjust based on model specifics
+        src_resolution = src_sr / (src_audio.shape[0] / src_feats.shape[0])  # Approximation, adjust based on model specifics
+        tgt_resolution = tgt_sr / (tgt_audio.shape[0] / tgt_feats.shape[0])  # Approximation, adjust based on model specifics
 
     else:
         # waveform
         src_feats, tgt_feats = src_audio, tgt_audio
-        resolution = src_sr
+        src_resolution = src_sr
+        tgt_resolution = tgt_sr
 
     for interval in interval_list:
         output_dir = os.path.join(output_root, interval)
@@ -140,16 +144,16 @@ def seq_dtw(src_wav_path, tgt_wav_path, src_intervals, tgt_intervals, feats, out
             os.makedirs(output_dir)
         
         log_fn = open(os.path.join(output_dir, uttid + ".log"), "w")
-        #if len(src_intervals[interval]) != len(tgt_intervals[interval]): continue
         assert len(src_intervals[interval]) == len(tgt_intervals[interval])
         
         for (src_start, src_end, src_text), (tgt_start, tgt_end, tgt_text) in zip(src_intervals[interval], tgt_intervals[interval]):
             assert src_text == tgt_text
             # Sampling Points
-            src_start_index = int(src_start * src_sr / resolution)
-            src_end_index = int(src_end * src_sr / resolution)
-            tgt_start_index = int(tgt_start * tgt_sr / resolution)
-            tgt_end_index = int(tgt_end * tgt_sr / resolution)
+            src_start_index = int(src_start * src_resolution)
+            src_end_index = int(src_end * src_resolution)
+            tgt_start_index = int(tgt_start * tgt_resolution)
+            tgt_end_index = int(tgt_end * tgt_resolution)
+            print((src_feats.shape, tgt_feats.shape), (src_start_index, src_end_index), (tgt_start_index, tgt_end_index))
         
             if src_end_index == src_start_index:
                 src_end_index += 1
@@ -160,8 +164,8 @@ def seq_dtw(src_wav_path, tgt_wav_path, src_intervals, tgt_intervals, feats, out
             # Segmentation
             src_segment = src_feats[src_start_index:src_end_index]
             tgt_segment = tgt_feats[tgt_start_index:tgt_end_index]
-        
             path, distance = compute_dtw_distance(src_segment, tgt_segment)
+            distance /= src_feats.shape[0]
             log_fn.write(f"{src_text},{distance}\n")
         
         log_fn.close()

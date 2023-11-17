@@ -52,14 +52,10 @@ else:
 # Data Preparation
 src_wavscp = os.path.join(data_dir, wavscp_fn)
 src_text = os.path.join(data_dir, "text")
-src_phn = os.path.join(data_dir, "transcript_phn_text")
-src_phn_wb = os.path.join(data_dir, "transcript_phn_text_wb")
 
 uttid_list = []
 src_wavscp_dict = {}
 src_text_dict = {}
-src_phn_dict = {}
-src_phn_wb_dict = {}
 
 with open(src_wavscp, "r") as fn:
     for line in fn.readlines():
@@ -74,20 +70,6 @@ with open(src_text, "r") as fn:
         text = " ".join(info[1:])
         src_text_dict[uttid] = text
 
-with open(src_phn, "r") as fn:
-    for line in fn.readlines():
-        info = line.split()
-        uttid = info[0]
-        text = " ".join(info[1:])
-        src_phn_dict[uttid] = text
-
-with open(src_phn_wb, "r") as fn:
-    for line in fn.readlines():
-        info = line.split()
-        uttid = info[0]
-        text = " ".join(info[1:])
-        src_phn_wb_dict[uttid] = text
-
 # initialize model
 charsiu = charsiu_forced_aligner(aligner='charsiu/en_w2v2_fc_10ms', sil_threshold=4, cost_thres=0.0)
 
@@ -97,8 +79,6 @@ hard_tried_sils = [(6, 0.0), (10, 0.0), (15, 0.0), (15, 0.8), (15, 0.9), (20, 0.
 for uttid in tqdm(uttid_list):
     wav_path = src_wavscp_dict[uttid]
     text = src_text_dict[uttid]
-    text_phn = src_phn_dict[uttid]
-    phones = ast.literal_eval(src_phn_wb_dict[uttid].upper())
     
     textgrid_fn = os.path.join(output_dir, uttid + ".TextGrid")
 
@@ -106,9 +86,7 @@ for uttid in tqdm(uttid_list):
         continue
     
     owrds = text.split()
-    ophns = re.sub("sil", "", text_phn).split()
     num_owrds = len(owrds)
-    num_ophns = len(ophns)
     
     # sanic check
     # perform forced alignment
@@ -116,14 +94,14 @@ for uttid in tqdm(uttid_list):
     num_awrds = sum(1 for _, _, word in awrds if word != '[SIL]')
     num_aphns = sum(1 for _, _, phone in aphns if phone != '[SIL]')
 
-    if num_ophns < num_aphns:
+    if num_owrds < num_awrds:
         tried_sils = hard_tried_sils
     else:       
         tried_sils = easy_tried_sils
 
     tried_idx = -1
     
-    while num_ophns != num_aphns:
+    while num_owrds != num_awrds:
         try:
             tried_idx += 1
             charsiu.sil_threshold, charsiu.cost_thres = tried_sils[tried_idx]
@@ -131,23 +109,22 @@ for uttid in tqdm(uttid_list):
             tried_idx -= 1
             break
         
-        aphns, awrds = charsiu.align(audio=wav_path, text=text, ref_phones=phones)
+        aphns, awrds = charsiu.align(audio=wav_path, text=text)
         num_awrds = sum(1 for _, _, word in awrds if word != '[SIL]')
         num_aphns = sum(1 for _, _, phone in aphns if phone != '[SIL]')
     
-    if num_ophns != num_aphns:
+    if num_wrds != num_wrds:
         print()
         print("aligner.py")
-        print("ophns", ophns)
-        print("phones", phones)
-        print("aligned_phones", [p for _, _, p in aphns if p != "[SIL]"])
-        print("aphns", aphns)
+        print("owrds", owrds)
+        print("awrds_text", [p for _, _, p in awrds if p != "[SIL]"])
+        print("awrds", aphns)
         print("tried_idx", tried_idx, tried_sils[tried_idx])
         input()
         
     # perform forced alignment and save the output as a textgrid file
     charsiu.serve(audio=wav_path,
-                  text=text, ref_phones=phones,
+                  text=text,
                   save_to=textgrid_fn)
     
     if tried_idx != -1:
